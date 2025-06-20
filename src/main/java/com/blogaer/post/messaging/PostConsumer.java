@@ -1,5 +1,6 @@
 package com.blogaer.post.messaging;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +33,7 @@ public class PostConsumer {
     MsgPublisher publisher;
 
     @Incoming("PostRpcChannel")
-    public Uni<Void> consumeRpc(Message<?> msg) {
+    public Uni<Void> consumePostRpc(Message<byte[]> msg) {
         Metadata meta = msg.getMetadata();
         Optional<IncomingRabbitMQMetadata> incomingMeta = meta.get(IncomingRabbitMQMetadata.class);
 
@@ -40,81 +41,112 @@ public class PostConsumer {
             String routingKey = incomingMeta.get().getRoutingKey();
             Optional<String> replyTo = incomingMeta.get().getReplyTo();
             Optional<String> correlationId = incomingMeta.get().getCorrelationId();
-            Object payload = msg.getPayload();
+            byte[] payload = msg.getPayload();
 
-            switch (routingKey) {
-                case "post.get.by.page.key" -> {
-                    PageDto pageDto = mapper.convertValue(payload, PageDto.class);
-                    int number = Integer.parseInt(pageDto.getNumber());
-                    int size = Integer.parseInt(pageDto.getSize());
-                    Uni<List<PostDto>> listDtoUni = service.getPostsByPage(pageDto).collect().asList();
+            try {
+                switch (routingKey) {
+                    case "post.add.key" -> {
+                        PostDto postDto = mapper.readValue(payload, PostDto.class);
 
-                    return listDtoUni.flatMap(list -> {
-                        PagedPostDto.Builder data = PagedPostDto.builder();
-                        data.currentPage(number);
-                        data.totalPages((int) Math.ceil((double) list.size() / size));
-                        data.totalPosts(list.size());
+                        return Helper.invokeAndLog(service.addPost(postDto)
+                                .flatMap(postId -> publisher.publish(replyTo, correlationId, postId)));
+                    }
+                    case "post.get.by.page.key" -> {
+                        PageDto pageDto = mapper.readValue(payload, PageDto.class);
+                        int number = Integer.parseInt(pageDto.getNumber());
+                        int size = Integer.parseInt(pageDto.getSize());
+                        Uni<List<PostDto>> listUni = service.getPostsByPage(pageDto).collect().asList();
 
-                        return publisher.publish(replyTo, correlationId, data);
-                    });
+                        return listUni.flatMap(list -> {
+                            PagedPostDto.Builder dataBuilder = PagedPostDto.builder();
+                            dataBuilder.currentPage(number);
+                            dataBuilder.totalPages((int) Math.ceil((double) list.size() / size));
+                            dataBuilder.totalPosts(list.size());
+                            dataBuilder.posts(list);
+                            PagedPostDto data = dataBuilder.build();
+
+                            return publisher.publish(replyTo, correlationId, data);
+                        });
+                    }
+                    case "post.get.by.id.key" -> {
+                        String id = mapper.readValue(payload, String.class);
+                        Uni<PostDto> postDtoUni = service.getPostById(id);
+
+                        return postDtoUni.flatMap(postDto -> {
+                            return publisher.publish(replyTo, correlationId, postDto);
+                        });
+                    }
+                    case "post.get.by.user.id.key" -> {
+                        PageDto pageDto = mapper.readValue(payload, PageDto.class);
+                        int number = Integer.parseInt(pageDto.getNumber());
+                        int size = Integer.parseInt(pageDto.getSize());
+                        Uni<List<PostDto>> listUni = service.getPostsByPage(pageDto).collect().asList();
+
+                        return listUni.flatMap(list -> {
+                            PagedPostDto.Builder dataBuilder = PagedPostDto.builder();
+                            dataBuilder.currentPage(number);
+                            dataBuilder.totalPages((int) Math.ceil((double) list.size() / size));
+                            dataBuilder.totalPosts(list.size());
+                            dataBuilder.posts(list);
+                            PagedPostDto data = dataBuilder.build();
+
+                            return publisher.publish(replyTo, correlationId, data);
+                        });
+                    }
+                    default -> Helper.invokeAndLog("POST - Routing key do not match, ignoring the message!");
                 }
-                case "post.get.by.id.key" -> {
-                    String id = payload.toString();
-                    Uni<PostDto> postDtoUni = service.getPostById(id);
+            } catch (Exception e) {
+                String errMsg = MessageFormat.format(
+                        "Message type >> RPC | Routing key >> {0} | Payload >> {1} | Error message >> {2}",
+                        routingKey,
+                        payload,
+                        e.getMessage());
+                Uni<String> errUni = Uni.createFrom().failure(new RuntimeException(errMsg, e));
+                e.printStackTrace();
 
-                    return postDtoUni.flatMap(postDto -> publisher.publish(replyTo, correlationId, postDto));
-                }
-                case "post.get.by.user.id.key" -> {
-                    PageDto pageDto = mapper.convertValue(payload, PageDto.class);
-                    int number = Integer.parseInt(pageDto.getNumber());
-                    int size = Integer.parseInt(pageDto.getSize());
-                    Uni<List<PostDto>> listDtoUni = service.getPostsByPage(pageDto).collect().asList();
-
-                    return listDtoUni.flatMap(list -> {
-                        PagedPostDto.Builder data = PagedPostDto.builder();
-                        data.currentPage(number);
-                        data.totalPages((int) Math.ceil((double) list.size() / size));
-                        data.totalPosts(list.size());
-
-                        return publisher.publish(replyTo, correlationId, data);
-                    });
-                }
-                default -> Helper.ackVoidAndLog("Routing key do not match, ignoring the message!");
+                return Helper.invokeAndLog(errUni);
             }
         }
-
-        return Helper.ackVoidAndLog("No incoming metadata provided, ignoring the message!");
+        return Helper.invokeAndLog("POST - No incoming metadata provided, ignoring the message!");
     }
 
     @Incoming("PostTopicChannel")
-    public Uni<Void> consumeTopic(Message<?> msg) {
+    public Uni<Void> consumeTopic(Message<byte[]> msg) {
         Metadata meta = msg.getMetadata();
         Optional<IncomingRabbitMQMetadata> incomingMeta = meta.get(IncomingRabbitMQMetadata.class);
 
         if (incomingMeta.isPresent()) {
             String routingKey = incomingMeta.get().getRoutingKey();
-            Object payload = msg.getPayload();
+            byte[] payload = msg.getPayload();
 
-            switch (routingKey) {
-                case "post.add.key" -> {
-                    PostDto postDto = mapper.convertValue(payload, PostDto.class);
+            try {
+                switch (routingKey) {
+                    case "post.patch.key" -> {
+                        PostDto postDto = mapper.readValue(payload, PostDto.class);
+                        System.out.println("POST ID >> " + postDto.getId());
 
-                    return Helper.ackVoidAndLog(service.addPost(postDto));
+                        return Helper.invokeAndLog(service.patchPost(postDto));
+                    }
+                    case "post.delete.key" -> {
+                        String id = mapper.readValue(payload, String.class);
+
+                        return Helper.invokeAndLog(service.deletePost(id));
+                    }
+                    default -> Helper.invokeAndLog("POST - Routing key do not match, ignoring the message!");
                 }
-                case "post.patch.key" -> {
-                    PostDto postDto = mapper.convertValue(payload, PostDto.class);
+            } catch (Exception e) {
+                String errMsg = MessageFormat.format(
+                        "Message type >> Topic | Routing key >> {0} | Payload >> {1} | Error message >> {2}",
+                        routingKey,
+                        payload,
+                        e.getMessage());
+                Uni<String> errUni = Uni.createFrom().failure(new RuntimeException(errMsg, e));
+                e.printStackTrace();
 
-                    return Helper.ackVoidAndLog(service.patchPost(postDto));
-                }
-                case "post.delete.key" -> {
-                    String id = payload.toString();
-
-                    return Helper.ackVoidAndLog(service.deletePost(id));
-                }
-                default -> Helper.ackVoidAndLog("Routing key do not match, ignoring the message!");
+                return Helper.invokeAndLog(errUni);
             }
         }
 
-        return Helper.ackVoidAndLog("No incoming metadata provided, ignoring the message!");
+        return Helper.invokeAndLog("POST - No incoming metadata provided, ignoring the message!");
     }
 }
