@@ -13,6 +13,8 @@ public class PageDto {
     private String userId;
     private QueryDto queryDto;
 
+    public PageDto() {}
+
     public static Builder builder() {
         return new Builder();
     }
