@@ -1,4 +1,4 @@
-package com.blogaer.post.entities;
+package com.blogaer.post.dto;
 
 import java.text.MessageFormat;
 import java.time.Instant;
@@ -8,10 +8,8 @@ import java.util.List;
 
 import org.bson.Document;
 
-import io.quarkus.runtime.annotations.RegisterForReflection;
 
-@RegisterForReflection
-public class Draft {
+public class DraftDto {
 
     private String id;
     private String userId;
@@ -21,12 +19,13 @@ public class Draft {
     private Date createdAt;
     private Date updatedAt;
 
-    public Draft() {}
+    public DraftDto() {}
 
     public static Builder builder() {
         return new Builder();
     }
-    private Draft(Builder builder) {
+
+    private DraftDto(Builder builder) {
         this.id = builder.id;
         this.userId = builder.userId;
         this.title = builder.title;
@@ -35,6 +34,7 @@ public class Draft {
         this.createdAt = builder.createdAt != null ? builder.createdAt : Date.from(Instant.now());
         this.updatedAt = builder.updatedAt != null ? builder.createdAt : Date.from(Instant.now());
     }
+
     public static class Builder {
         private String id;
         private String userId;
@@ -47,17 +47,17 @@ public class Draft {
         public Builder id(String id) { this.id = id; return this; }
         public Builder userId(String userId) { this.userId = userId; return this; }
         public Builder title(String title) {this.title = title; return this;}
-        public Builder text(String text) { this.text = text; return this; }
+        public String getText() { return text; }
+        public void setText(String text) { this.text = text; }
         public Builder contentText(String text) {this.text = text; return this;}
         public Builder content(List<Document> content) {this.content = content; return this;}
         public Builder createdAt(Date createdAt) {this.createdAt = createdAt; return this;}
         public Builder updatedAt(Date updatedAt) {this.updatedAt = updatedAt; return this;}
 
-        public Draft build() {
-            return new Draft(this);
+        public DraftDto build() {
+            return new DraftDto(this);
         }
     }
-
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getUserId() { return userId; }
@@ -94,7 +94,7 @@ public class Draft {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Draft other = (Draft) obj;
+        DraftDto other = (DraftDto) obj;
         if (id == null) {
             if (other.id != null)
                 return false;
@@ -135,6 +135,6 @@ public class Draft {
 
     @Override
     public String toString() {
-        return MessageFormat.format("Draft [id={0}, userId={1}, title={2}, text={3} content={4}, createdAt={5}, updatedAt={6}]", id, userId, title, text, content, createdAt, updatedAt);
+        return MessageFormat.format("Draft [id={0}, userId={1}, title={2}, content={3}, createdAt={4}, updatedAt={5}]", id, userId, title, content, createdAt, updatedAt);
     }
 }
