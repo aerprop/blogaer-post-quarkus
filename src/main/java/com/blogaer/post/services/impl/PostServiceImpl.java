@@ -8,9 +8,12 @@ import com.blogaer.post.utils.mapper.PostMapper;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+@ApplicationScoped
 public class PostServiceImpl implements PostService {
+
     @Inject
     PostRepo repo;
 
