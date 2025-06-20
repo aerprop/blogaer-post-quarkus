@@ -15,14 +15,6 @@ public interface PostMapper {
 
     Post postDtoToPost(PostDto postDto);
 
-    CommentDto commentToCommentDto(Comment comment);
-
-    Comment commentDtoToComment(CommentDto commentDto);
-
-    ThoughtDto thoughtToThoughtDto(Thought thought);
-
-    Thought thoughtDtoToThought(ThoughtDto thoughtDto);
-
     List<CommentDto> commentListToCommentDtoList(List<Comment> commentList);
 
     List<Comment> commentDtoListToCommentList(List<CommentDto> commentDtoList);

@@ -3,8 +3,6 @@ package com.blogaer.post.utils.mapper.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bson.types.ObjectId;
-
 import com.blogaer.post.dto.CommentDto;
 import com.blogaer.post.dto.PostDto;
 import com.blogaer.post.dto.ThoughtDto;
@@ -24,15 +22,13 @@ public class PostMapperImpl implements PostMapper {
             return null;
 
         PostDto.Builder postDto = PostDto.builder();
-
-        postDto.id(post.getId().toString());
+        postDto.id(post.getId());
         postDto.userId(post.getUserId());
         postDto.title(post.getTitle());
+        postDto.text(post.getText());
         postDto.content(post.getContent());
         postDto.categories(post.getCategories());
         postDto.tags(post.getTags());
-        postDto.comments(commentListToCommentDtoList(post.getComments()));
-        postDto.thoughts(thoughtListToThoughtDtoList(post.getThoughts()));
         postDto.reads(post.getReads());
         postDto.createdAt(post.getCreatedAt());
         postDto.updatedAt(post.getUpdatedAt());
@@ -46,72 +42,18 @@ public class PostMapperImpl implements PostMapper {
             return null;
 
         Post.Builder post = Post.builder();
-
-        post.id(new ObjectId(postDto.getId()));
+        post.id(postDto.getId());
         post.userId(postDto.getUserId());
         post.title(postDto.getTitle());
+        post.text(postDto.getText());
         post.content(postDto.getContent());
         post.categories(postDto.getCategories());
         post.tags(postDto.getTags());
-        post.comments(commentDtoListToCommentList(postDto.getComments()));
-        post.thoughts(thoughtDtoListToThoughtList(postDto.getThoughts()));
         post.reads(postDto.getReads());
         post.createdAt(postDto.getCreatedAt());
         post.updatedAt(postDto.getUpdatedAt());
 
         return post.build();
-    }
-
-    @Override
-    public CommentDto commentToCommentDto(Comment comment) {
-        if (comment == null)
-            return null;
-
-        CommentDto.Builder commentDto = CommentDto.builder();
-
-        commentDto.commentId(comment.getId());
-        commentDto.commentText(comment.getCommentText());
-
-        return commentDto.build();
-    }
-
-    @Override
-    public Comment commentDtoToComment(CommentDto commentDto) {
-        if (commentDto == null)
-            return null;
-
-        Comment.Builder comment = Comment.builder();
-
-        comment.commentId(commentDto.getCommentId());
-        comment.commentText(commentDto.getCommentText());
-
-        return comment.build();
-    }
-
-    @Override
-    public ThoughtDto thoughtToThoughtDto(Thought thought) {
-        if (thought == null)
-            return null;
-
-        ThoughtDto.Builder thoughtDto = ThoughtDto.builder();
-
-        thoughtDto.id(thought.getId());
-        thoughtDto.thoughts(thought.getThoughts());
-
-        return thoughtDto.build();
-    }
-
-    @Override
-    public Thought thoughtDtoToThought(ThoughtDto thoughtDto) {
-        if (thoughtDto == null)
-            return null;
-
-        Thought.Builder thought = Thought.builder();
-
-        thought.id(thoughtDto.getId());
-        thought.thoughts(thoughtDto.getThoughts());
-
-        return thought.build();
     }
 
     @Override
@@ -166,4 +108,47 @@ public class PostMapperImpl implements PostMapper {
         return thoughtList;
     }
 
+    protected CommentDto commentToCommentDto(Comment comment) {
+        if (comment == null)
+            return null;
+
+        CommentDto.Builder commentDto = CommentDto.builder();
+        commentDto.id(comment.get_id().toString());
+        commentDto.text(comment.getText());
+
+        return commentDto.build();
+    }
+
+    protected Comment commentDtoToComment(CommentDto commentDto) {
+        if (commentDto == null)
+            return null;
+
+        Comment.Builder comment = Comment.builder();
+        comment.id(commentDto.getId());
+        comment.text(commentDto.getText());
+
+        return comment.build();
+    }
+
+    protected ThoughtDto thoughtToThoughtDto(Thought thought) {
+        if (thought == null)
+            return null;
+
+        ThoughtDto.Builder thoughtDto = ThoughtDto.builder();
+        thoughtDto.id(thought.get_id().toString());
+        thoughtDto.thoughts(thought.getThoughts());
+
+        return thoughtDto.build();
+    }
+
+    protected Thought thoughtDtoToThought(ThoughtDto thoughtDto) {
+        if (thoughtDto == null)
+            return null;
+
+        Thought.Builder thought = Thought.builder();
+        thought.id(thoughtDto.getId());
+        thought.thoughts(thoughtDto.getThoughts());
+
+        return thought.build();
+    }
 }
