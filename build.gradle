@@ -36,14 +36,3 @@ compileJava {
 compileTestJava {
     options.encoding = 'UTF-8'
 }
-
-sourceSets {
-    main {
-        resources {
-            exclude '**/node_modules/**'
-            exclude '**/package.json'
-            exclude '**/package-lock.json' // Good idea to exclude this too
-            exclude '**/bun.lock' // Or yarn.lock
-        }
-    }
-}
