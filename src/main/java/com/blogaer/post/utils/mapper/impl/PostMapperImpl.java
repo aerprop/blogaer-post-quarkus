@@ -113,7 +113,7 @@ public class PostMapperImpl implements PostMapper {
             return null;
 
         CommentDto.Builder commentDto = CommentDto.builder();
-        commentDto.id(comment.get_id().toString());
+        commentDto.id(comment.getId());
         commentDto.text(comment.getText());
 
         return commentDto.build();
@@ -135,7 +135,7 @@ public class PostMapperImpl implements PostMapper {
             return null;
 
         ThoughtDto.Builder thoughtDto = ThoughtDto.builder();
-        thoughtDto.id(thought.get_id().toString());
+        thoughtDto.id(thought.getId());
         thoughtDto.thoughts(thought.getThoughts());
 
         return thoughtDto.build();
