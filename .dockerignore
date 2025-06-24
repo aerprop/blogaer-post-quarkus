@@ -1,5 +1,42 @@
-*
-!build/*-runner
-!build/*-runner.jar
-!build/lib/*
-!build/quarkus-app/*
+# Ignore Git-related files
+.git
+.gitignore
+
+# Ignore IDE files
+.idea/
+.project/
+.classpath
+.settings/
+*.iml
+*.iws
+*.ipr
+
+# Ignore Gradle/Maven specific build files and caches
+.gradle/
+build/
+target/
+!build/*.jar # If you're building JVM and copying a JAR
+!build/*-runner # If you're building native and copying the runner
+!target/ # Maven equivalent
+!.gradle/wrapper/ # Keep Gradle wrapper
+!.mvn/wrapper/   # Keep Maven wrapper
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore temporary files
+tmp/
+**/*.tmp
+**/*.temp
+
+# Ignore Docker related files that are not needed in the build context
+Dockerfile* # You're explicitly using one, so this can be ignored for context transfer
+docker-compose.yml
+
+# Specifically, DO NOT IGNORE the following, as your Dockerfile copies them:
+# src/
+# gradlew
+# gradle/
+# build.gradle
+# settings.gradle
