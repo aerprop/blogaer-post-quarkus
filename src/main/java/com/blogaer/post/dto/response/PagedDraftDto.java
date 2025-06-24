@@ -5,6 +5,9 @@ import java.util.List;
 
 import com.blogaer.post.dto.DraftDto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class PagedDraftDto {
 
     private int currentPage;

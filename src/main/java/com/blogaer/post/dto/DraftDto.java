@@ -8,6 +8,9 @@ import java.util.List;
 
 import org.bson.Document;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 
 public class DraftDto {
 
