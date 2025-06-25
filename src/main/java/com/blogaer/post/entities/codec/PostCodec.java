@@ -79,7 +79,7 @@ public class PostCodec implements CollectibleCodec<Post> {
         post.userId(doc.getString("userId"));
         post.title(doc.getString("title"));
         post.text(doc.getString("text"));
-        post.content((List<Document>) doc.get("content"));
+        post.content((List<Object>) doc.get("content"));
         post.categories((List<String>) doc.get("categories"));
         post.tags((List<String>) doc.get("tags"));
         post.reads(doc.getInteger("reads"));

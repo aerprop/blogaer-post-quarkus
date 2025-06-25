@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.bson.Document;
-
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @RegisterForReflection
@@ -17,7 +15,7 @@ public class Draft {
     private String userId;
     private String title;
     private String text;
-    private List<Document> content;
+    private List<Object> content;
     private Date createdAt;
     private Date updatedAt;
 
@@ -40,7 +38,7 @@ public class Draft {
         private String userId;
         private String title;
         private String text;
-        private List<Document> content;
+        private List<Object> content;
         private Date createdAt;
         private Date updatedAt;
 
@@ -49,7 +47,7 @@ public class Draft {
         public Builder title(String title) {this.title = title; return this;}
         public Builder text(String text) { this.text = text; return this; }
         public Builder contentText(String text) {this.text = text; return this;}
-        public Builder content(List<Document> content) {this.content = content; return this;}
+        public Builder content(List<Object> content) {this.content = content; return this;}
         public Builder createdAt(Date createdAt) {this.createdAt = createdAt; return this;}
         public Builder updatedAt(Date updatedAt) {this.updatedAt = updatedAt; return this;}
 
@@ -65,8 +63,8 @@ public class Draft {
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
     public String getText() { return text; }  
-    public void setText(String contentText) { this.text = contentText; } public List<Document> getContent() { return content; }
-    public void setContent(List<Document> content) { this.content = content; }
+    public void setText(String contentText) { this.text = contentText; } public List<Object> getContent() { return content; }
+    public void setContent(List<Object> content) { this.content = content; }
     public Date getCreatedAt() { return createdAt; }
     public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
     public Date getUpdatedAt() { return updatedAt; }

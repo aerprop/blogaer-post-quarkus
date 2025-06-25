@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.bson.Document;
-
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @RegisterForReflection
@@ -17,7 +15,7 @@ public class Post {
     private String userId;
     private String title;
     private String text;
-    private List<Document> content;
+    private List<Object> content;
     private List<String> categories;
     private List<String> tags;
     private int reads;
@@ -48,7 +46,7 @@ public class Post {
         private String userId;
         private String title;
         private String text;
-        private List<Document> content;
+        private List<Object> content;
         private List<String> categories;
         private List<String> tags;
         private int reads;
@@ -59,7 +57,7 @@ public class Post {
         public Builder userId(String userId) { this.userId = userId; return this; }
         public Builder title(String title) { this.title = title; return this; }
         public Builder text(String text) { this.text = text; return this; }
-        public Builder content(List<Document> content) { this.content = content; return this; }
+        public Builder content(List<Object> content) { this.content = content; return this; }
         public Builder categories(List<String> categories) { this.categories = categories; return this; }
         public Builder tags(List<String> tags) { this.tags = tags; return this; }
         public Builder reads(int reads) { this.reads = reads; return this; }
@@ -79,8 +77,8 @@ public class Post {
     public void setTitle(String title) { this.title = title; }
     public String getText() { return text; }
     public void setText(String text) { this.text = text; }
-    public List<Document> getContent() { return content; }
-    public void setContent(List<Document> content) { this.content = content; }
+    public List<Object> getContent() { return content; }
+    public void setContent(List<Object> content) { this.content = content; }
     public List<String> getCategories() { return categories; }
     public void setCategories(List<String> categories) { this.categories = categories; }
     public List<String> getTags() { return tags; }

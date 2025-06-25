@@ -76,7 +76,7 @@ public class DraftCodec implements CollectibleCodec<Draft> {
         draft.userId(doc.getString("userId"));
         draft.title(doc.getString("title"));
         draft.text(doc.getString("text"));
-        draft.content((List<Document>) doc.get("content"));
+        draft.content((List<Object>) doc.get("content"));
         draft.createdAt(doc.getDate("createdAt"));
         draft.updatedAt(doc.getDate("updatedAt"));
 

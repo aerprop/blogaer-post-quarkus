@@ -1,9 +1,5 @@
 package com.blogaer.post.utils.mapper.impl;
 
-import java.util.stream.Collectors;
-
-import org.bson.Document;
-
 import com.blogaer.post.dto.DraftDto;
 import com.blogaer.post.entities.Draft;
 import com.blogaer.post.utils.mapper.DraftMapper;
@@ -27,7 +23,7 @@ public class DraftMapperImpl implements DraftMapper {
         draftDto.id(draft.getId());
         draftDto.userId(draft.getUserId());
         draftDto.title(draft.getTitle());
-        draftDto.content(draft.getContent().stream().map(content -> (Object) content).collect(Collectors.toList()));
+        draftDto.content(draft.getContent());
         draftDto.createdAt(draft.getCreatedAt());
         draftDto.updatedAt(draft.getUpdatedAt());
 
@@ -43,7 +39,7 @@ public class DraftMapperImpl implements DraftMapper {
         draft.id(draftDto.getId());
         draft.userId(draftDto.getUserId());
         draft.title(draftDto.getTitle());
-        draft.content(draftDto.getContent().stream().map(content -> (Document) content).collect(Collectors.toList()));
+        draft.content(draftDto.getContent());
         draft.createdAt(draftDto.getCreatedAt());
         draft.updatedAt(draftDto.getUpdatedAt());
 
